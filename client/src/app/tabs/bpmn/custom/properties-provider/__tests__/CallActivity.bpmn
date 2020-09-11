@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_0l1dxrj" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Zeebe Modeler" exporterVersion="0.8.0-dev">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_0l1dxrj" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Zeebe Modeler" exporterVersion="0.11.0-dev.20200911">
   <bpmn:process id="Process_1" isExecutable="true">
     <bpmn:callActivity id="CallActivity_1">
       <bpmn:extensionElements>
@@ -7,6 +7,11 @@
       </bpmn:extensionElements>
     </bpmn:callActivity>
     <bpmn:callActivity id="CallActivity_empty" />
+    <bpmn:callActivity id="CallActivity_2">
+      <bpmn:extensionElements>
+        <zeebe:calledElement propagateAllChildVariables="true" />
+      </bpmn:extensionElements>
+    </bpmn:callActivity>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
@@ -15,6 +20,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="CallActivity_14j0m4l_di" bpmnElement="CallActivity_empty">
         <dc:Bounds x="210" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_06dxupi_di" bpmnElement="CallActivity_2">
+        <dc:Bounds x="630" y="150" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

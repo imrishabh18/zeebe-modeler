@@ -12,7 +12,11 @@ import elementHelper from 'bpmn-js-properties-panel/lib/helper/ElementHelper';
 
 import cmdHelper from 'bpmn-js-properties-panel/lib/helper/CmdHelper';
 
-import extensionElementsHelper from 'bpmn-js-properties-panel/lib/helper/ExtensionElementsHelper';
+import {
+  getCalledElement,
+  isPropagateAllChildVariables,
+  hasOutputMapping
+} from '../helper/CallActivityHelper';
 
 import {
   is,
@@ -85,15 +89,34 @@ export default function(group, element, bpmnFactory, translate) {
     }
   }));
 
-}
+  group.entries.push(entryFactory.checkbox({
+    id: 'propagate-all-child-variables',
+    label: translate('Propagate all child variables'),
+    modelProperty: 'propagateAllChildVariables',
 
-// helper //////////
+    get: function(element) {
+      const propagateAllChildVariables = isPropagateAllChildVariables(
+        getBusinessObject(element));
+      return {
+        propagateAllChildVariables: propagateAllChildVariables
+      };
+    },
 
-function getCalledElement(bo) {
-  const elements = getExtensionElements(bo, 'zeebe:CalledElement') || [];
-  return elements[0];
-}
+    set: function(element, values) {
+      return setProperties(element, {
+        propagateAllChildVariables: values.propagateAllChildVariables ||
+          false
+      });
+    },
 
-function getExtensionElements(bo, type) {
-  return extensionElementsHelper.getExtensionElements(bo, type);
+    validate : function(element, values) {
+      if(values.propagateAllChildVariables == true && hasOutputMapping(getBusinessObject(element))) {
+        return {
+          propagateAllChildVariables: translate('Output parameter mappings exist: only parameters defined in the mapping will be propagated')
+        }
+      }
+
+    }
+  }));
+
 }

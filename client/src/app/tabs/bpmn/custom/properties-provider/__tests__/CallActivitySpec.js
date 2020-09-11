@@ -14,7 +14,8 @@ import {
 } from 'bpmn-js/test/helper';
 
 import {
-  triggerValue
+  triggerValue,
+  triggerEvent
 } from './helper';
 
 import TestContainer from 'mocha-test-container-support';
@@ -29,7 +30,10 @@ import {
   getBusinessObject
 } from 'bpmn-js/lib/util/ModelUtil';
 
-import extensionElementsHelper from 'bpmn-js-properties-panel/lib/helper/ExtensionElementsHelper';
+import {
+  getCalledElement,
+  isPropagateAllChildVariables
+} from '../helper/CallActivityHelper';
 
 import coreModule from 'bpmn-js/lib/core';
 import selectionModule from 'diagram-js/lib/features/selection';
@@ -104,6 +108,7 @@ describe('customs - call activity', function() {
         // when
         triggerValue(input, 'foo', 'change');
       }));
+
 
       it('should execute', function() {
 
@@ -244,19 +249,175 @@ describe('customs - call activity', function() {
 
   });
 
+
+  describe.only('of propagateAllChildVariables', function() {
+
+    describe('create', function() {
+
+      let bo, input;
+
+      beforeEach(inject(function(elementRegistry, selection) {
+
+        // given
+        const shape = elementRegistry.get('CallActivity_empty');
+        selection.select(shape);
+
+        bo = getBusinessObject(shape);
+
+        const calledElement = getCalledElement(bo);
+
+        // assume
+        expect(calledElement).to.be.undefined;
+
+        input = getInputField(
+          container,
+          'camunda-callActivity-propagateAllChildVariables',
+          'propagateAllChildVariables'
+        );
+
+        // when
+        triggerEvent(input, 'click');
+      }));
+
+
+      it('should execute', function() {
+
+        // then
+        const propagateAllChildVariables = isPropagateAllChildVariables(bo);
+
+        expect(propagateAllChildVariables).to.be.true;
+      });
+
+
+      it('should execute twice', function() {
+
+        // when
+        triggerEvent(input, 'click');
+
+        // then
+        const propagateAllChildVariables = isPropagateAllChildVariables(bo);
+
+        expect(propagateAllChildVariables).to.be.false;
+      });
+
+
+      it('should undo', inject(function(commandStack) {
+
+        // when
+        commandStack.undo();
+
+        // then
+        const calledElement = getCalledElement(bo);
+
+        expect(calledElement).to.be.undefined;
+      }));
+
+
+      it('should redo', inject(function(commandStack) {
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        const propagateAllChildVariables = isPropagateAllChildVariables(bo);
+
+        expect(propagateAllChildVariables).to.be.true;
+      }));
+
+
+    });
+
+
+    describe('update', function() {
+
+      let bo, input;
+
+      beforeEach(inject(function(elementRegistry, selection) {
+
+        // given
+        const shape = elementRegistry.get('CallActivity_2');
+        selection.select(shape);
+
+        bo = getBusinessObject(shape);
+
+        const propagateAllChildVariables = isPropagateAllChildVariables(bo);
+
+        // assume
+        expect(propagateAllChildVariables).to.exist;
+        expect(propagateAllChildVariables).to.be.true;
+
+        input = getInputField(
+          container,
+          'camunda-callActivity-propagateAllChildVariables',
+          'propagateAllChildVariables'
+        );
+
+        // when
+        triggerEvent(input, 'click');
+      }));
+
+
+      it('should execute', function() {
+
+        // then
+        const propagateAllChildVariables = isPropagateAllChildVariables(bo);
+
+        expect(propagateAllChildVariables).to.exist;
+        expect(propagateAllChildVariables).to.be.false;
+      });
+
+
+      it('should execute twice', function() {
+
+        // when
+        triggerEvent(input, 'click');
+
+        // then
+        const propagateAllChildVariables = isPropagateAllChildVariables(bo);
+
+        expect(propagateAllChildVariables).to.exist;
+        expect(propagateAllChildVariables).to.be.true;
+      });
+
+
+      it('should undo', inject(function(commandStack) {
+
+        // when
+        commandStack.undo();
+
+        // then
+        const propagateAllChildVariables = isPropagateAllChildVariables(bo);
+
+        expect(propagateAllChildVariables).to.exist;
+        expect(propagateAllChildVariables).to.be.true;
+      }));
+
+
+      it('should redo', inject(function(commandStack) {
+
+        // when
+        commandStack.undo();
+        commandStack.redo();
+
+        // then
+        const propagateAllChildVariables = isPropagateAllChildVariables(bo);
+
+        expect(propagateAllChildVariables).to.exist;
+        expect(propagateAllChildVariables).to.be.false;
+      }));
+
+
+    });
+
+
+  });
+
+
 });
 
 
 // helper /////////
-
-const getCalledElement = (bo) => {
-
-  const extensions = extensionElementsHelper.getExtensionElements(
-    bo,
-    'zeebe:CalledElement'
-  );
-  return (extensions || [])[0];
-};
 
 const getGeneralTab = (container) => {
   return domQuery('div[data-tab="general"]', container);
